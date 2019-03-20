@@ -145,13 +145,13 @@ int  Del_min_max(LinkList L, int min, int max)
 int Insert_2(LinkList L, int e)			//递增单链表插入
 {
 	LinkList p, q, s;
-	p = L->next;
+	p = L;
 	
-	while (p && p->data < e)		//寻找小于e的位置
+	while (p->next && p->next->data < e)		//寻找小于e的位置
 	{
 		s = (LinkList)malloc(sizeof(LNode));		//生成新的结点
 		s->data = e;		//插入数据
-		q = p;		
+		q = p->next;		
 		p = p->next;
 	}
 	q->next = s;
