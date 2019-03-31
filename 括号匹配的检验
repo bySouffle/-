@@ -1,0 +1,115 @@
+//bysouffle
+/**
+  实验2.5 括号匹配的检验
+假设表达式中允许有两种括号：圆括号和方括号，其嵌套的顺序随意。请编写程序完成表达式中的括号匹配的检测。设计相应的测试数据对所编写的程序进行测试。
+**/
+#include<malloc.h>
+#include<stdio.h>
+#include<math.h>
+#include<stdlib.h> 
+#define OK 1
+#define ERROR 0
+#define TRUE 1
+#define FALSE 0
+#define STACK_INIT_SIZE 10 // 存储空间初始分配量
+#define STACKINCREMENT 2 // 存储空间分配增量
+typedef char SElemType;
+
+struct SqStack
+{
+	SElemType *base; // 在栈构造之前和销毁之后，base的值为NULL
+	SElemType *top; // 栈顶指针
+	int stacksize; // 当前已分配的存储空间，以元素为单位
+}; // 顺序栈
+int InitStack(SqStack &S)
+{
+	S.base = (SElemType*)malloc(STACK_INIT_SIZE * sizeof(SElemType));
+	if (!S.base) return FALSE;
+	S.top = S.base;
+	S.stacksize = STACK_INIT_SIZE;
+	return OK;
+}
+
+int StackEmpty(SqStack S)
+{
+	if (S.base == S.top) return 1;
+	else return 0;
+}
+int Push(SqStack &S, SElemType e)
+{
+	if (S.top - S.base >= S.stacksize)
+	{
+		S.base = (SElemType*)realloc(S.base, (S.stacksize + STACKINCREMENT) * sizeof(SElemType));
+		if (!S.base)  return FALSE;
+		S.top = S.base + S.stacksize;
+		S.stacksize += STACKINCREMENT;
+	}
+	*(S.top) = e;
+	S.top++;
+	return OK;
+
+
+}
+int Pop(SqStack &S, SElemType &e)
+{
+	if (S.base == S.top)
+		return FALSE;
+	--S.top;
+	e = *(S.top);
+	return OK;
+
+}
+
+int check()
+{ // 对于输入的任意一个字符串，检验括号是否配对
+	SqStack s;
+	SElemType ch[80], *p, e;
+	if (InitStack(s)) // 初始化栈成功
+	{
+		gets_s(ch);
+		p = ch;
+		while (*p) // 没到串尾
+			switch (*p)
+			{
+			case '(':
+			case '[':
+				Push(s, *p++);
+				break; // 左括号入栈，且p++
+			case ')':
+			case ']':
+				if (!StackEmpty(s)) // 栈不空
+
+					{
+					Pop(s, e);	// 弹出栈顶元素
+					if (e != '('&& *p == ')' || *p == ']'&&e != '[')	// 弹出的栈顶元素与*p不配对
+						{
+						printf("Wrong\n");
+						return ERROR;
+						}
+					else
+						{
+						p++;
+						break;	// 跳出switch语句
+						}
+					}
+				else // 栈空
+				{
+				printf("Wrong缺少左括符\n");
+				return ERROR;
+				}
+				default: p++;;	// 其它字符不处理，指针向后移
+			} 
+		if (StackEmpty(s))	//字符串结束时栈空
+			printf("OK\n");
+		else
+			printf("Wrong缺少右括符\n");
+	}
+	return OK;
+}
+int main()
+{
+	printf("请输入表达式(Ctrl c退出)\n");
+	while (1)
+	check();
+	system("pause");
+}
